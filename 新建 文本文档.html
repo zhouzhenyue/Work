@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .video-modal {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 90%;
+            max-width: 800px;
+        }
+        
+        .video-modal-header {
+            background: #333;
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- 视频链接列表 -->
+    <div>
+        <p><a href="#" onclick="openVideo('video1'); return false;">播放视频1 - 兔子视频</a></p>
+        <p><a href="#" onclick="openVideo('video2'); return false;">播放视频2 - 汽车视频</a></p>
+        <p><a href="#" onclick="openVideo('video3'); return false;">播放视频3 - 鲸鱼视频</a></p>
+    </div>
+    
+    <!-- 悬浮视频层 -->
+    <div class="video-overlay" id="videoOverlay">
+        <div class="video-modal">
+            <div class="video-modal-header">
+                <span id="videoTitle">视频播放</span>
+                <button class="close-btn" onclick="closeVideo()">×</button>
+            </div>
+            <video id="videoPlayer" controls>
+                <!-- 视频源将通过JS动态设置 -->
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+    </div>
+
+    <script>
+        // 视频数据配置
+        const videos = {
+            'video1': {
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                title: '兔子视频'
+            },
+            'video2': {
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                title: '大象之梦'
+            },
+            'video3': {
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+                title: '火焰视频'
+            }
+        };
+        
+        let currentVideoId = null;
+        
+        function openVideo(videoId) {
+            const overlay = document.getElementById('videoOverlay');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoTitle = document.getElementById('videoTitle');
+            
+            // 获取视频数据
+            const video = videos[videoId];
+            if (!video) return;
+            
+            // 设置视频和标题
+            videoPlayer.src = video.url;
+            videoTitle.textContent = video.title;
+            currentVideoId = videoId;
+            
+            // 显示并播放
+            overlay.style.display = 'flex';
+            videoPlayer.play().catch(e => console.log("需要用户交互"));
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeVideo() {
+            const overlay = document.getElementById('videoOverlay');
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            videoPlayer.pause();
+            videoPlayer.currentTime = 0;
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentVideoId = null;
+        }
+        
+        document.getElementById('videoOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeVideo();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeVideo();
+        });
+    </script>
+</body>
+</html>
